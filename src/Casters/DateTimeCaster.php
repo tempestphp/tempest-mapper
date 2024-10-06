@@ -32,10 +32,6 @@ final readonly class DateTimeCaster implements Caster
 
     public function cast(mixed $input): DateTimeInterface
     {
-        if ($input instanceof DateTimeInterface) {
-            return $input;
-        }
-
         if ($this->immutable) {
             $date = DateTimeImmutable::createFromFormat($this->format, $input);
         } else {
