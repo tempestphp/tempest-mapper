@@ -4,33 +4,38 @@ declare(strict_types=1);
 
 namespace Tempest\Mapper;
 
+use Tempest\Container\Container;
 use Tempest\Core\Discovery;
-use Tempest\Core\DiscoveryLocation;
-use Tempest\Core\IsDiscovery;
+use Tempest\Core\HandlesDiscoveryCache;
 use Tempest\Reflection\ClassReflector;
 
-final class MapperDiscovery implements Discovery
+final readonly class MapperDiscovery implements Discovery
 {
-    use IsDiscovery;
+    use HandlesDiscoveryCache;
 
     public function __construct(
-        private readonly MapperConfig $config,
+        private MapperConfig $config,
     ) {
     }
 
-    public function discover(DiscoveryLocation $location, ClassReflector $class): void
+    public function discover(ClassReflector $class): void
     {
         if (! $class->implements(Mapper::class)) {
             return;
         }
 
-        $this->discoveryItems->add($location, $class->getName());
+        $this->config->mappers[] = $class->getName();
     }
 
-    public function apply(): void
+    public function createCachePayload(): string
     {
-        foreach ($this->discoveryItems as $className) {
-            $this->config->mappers[] = $className;
-        }
+        return serialize($this->config->mappers);
+    }
+
+    public function restoreCachePayload(Container $container, string $payload): void
+    {
+        $mappers = unserialize($payload, ['allowed_classes' => [Mapper::class]]);
+
+        $this->config->mappers = $mappers;
     }
 }
