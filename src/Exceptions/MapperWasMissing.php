@@ -6,7 +6,7 @@ namespace Tempest\Mapper\Exceptions;
 
 use Exception;
 
-final class MissingMapperException extends Exception
+final class MapperWasMissing extends Exception
 {
     public function __construct()
     {

@@ -6,7 +6,7 @@ namespace Tempest\Mapper\Exceptions;
 
 use Exception;
 
-final class MissingValuesException extends Exception
+final class MappingValuesWereMissing extends Exception
 {
     public function __construct(object|string $objectOrClass, array $missingValues)
     {

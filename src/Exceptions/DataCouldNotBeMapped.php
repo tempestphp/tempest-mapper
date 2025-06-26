@@ -6,7 +6,7 @@ namespace Tempest\Mapper\Exceptions;
 
 use Exception;
 
-final class CannotMapDataException extends Exception
+final class DataCouldNotBeMapped extends Exception
 {
     public function __construct(mixed $data, object|string $objectOrClass)
     {
