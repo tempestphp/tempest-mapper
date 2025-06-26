@@ -6,10 +6,10 @@ namespace Tempest\Mapper\Exceptions;
 
 use Exception;
 
-final class CannotCastValue extends Exception
+final class ValueCouldNotBeSerialized extends Exception
 {
     public function __construct(string $expectedType)
     {
-        parent::__construct('Could not cast value, input should be of type ' . $expectedType);
+        parent::__construct('Could not serialize value to ' . $expectedType);
     }
 }
