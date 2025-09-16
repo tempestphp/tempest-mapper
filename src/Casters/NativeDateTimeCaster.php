@@ -7,9 +7,10 @@ namespace Tempest\Mapper\Casters;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Tempest\Mapper\Caster;
 use Tempest\Reflection\PropertyReflector;
-use Tempest\Validation\Rules\DateTimeFormat;
+use Tempest\Validation\Rules\HasDateTimeFormat;
 
 final readonly class NativeDateTimeCaster implements Caster
 {
@@ -20,7 +21,7 @@ final readonly class NativeDateTimeCaster implements Caster
 
     public static function fromProperty(PropertyReflector $property): NativeDateTimeCaster
     {
-        $format = $property->getAttribute(DateTimeFormat::class)->format ?? 'Y-m-d H:i:s';
+        $format = $property->getAttribute(HasDateTimeFormat::class)->format ?? 'Y-m-d H:i:s';
 
         return match ($property->getType()->getName()) {
             DateTime::class => new NativeDateTimeCaster($format, immutable: false),
@@ -43,7 +44,7 @@ final readonly class NativeDateTimeCaster implements Caster
         $date = $class::createFromFormat($this->format, $input);
 
         if (! $date) {
-            return new $class($input);
+            throw new InvalidArgumentException("Must be a valid date in the format {$this->format}");
         }
 
         return $date;

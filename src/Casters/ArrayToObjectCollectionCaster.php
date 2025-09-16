@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tempest\Mapper\Casters;
 
 use Tempest\Mapper\Caster;
-use Tempest\Mapper\Mappers\ObjectToArrayMapper;
 use Tempest\Reflection\PropertyReflector;
+use Tempest\Support\Json;
 
 final readonly class ArrayToObjectCollectionCaster implements Caster
 {
@@ -17,11 +17,22 @@ final readonly class ArrayToObjectCollectionCaster implements Caster
     public function cast(mixed $input): mixed
     {
         $values = [];
+        $iterableType = $this->property->getIterableType();
 
-        $objectCaster = new ObjectCaster($this->property->getIterableType());
+        $caster = $iterableType->isEnum()
+            ? new EnumCaster($iterableType->getName())
+            : new ObjectCaster($iterableType);
+
+        if (Json\is_valid($input)) {
+            $input = Json\decode($input);
+        }
 
         foreach ($input as $key => $item) {
-            $values[$key] = $objectCaster->cast($item);
+            if (is_object($item) && $iterableType->matches($item::class)) {
+                $values[$key] = $item;
+            } else {
+                $values[$key] = $caster->cast($item);
+            }
         }
 
         return $values;
